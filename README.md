@@ -23,33 +23,22 @@ See it in action:
 
 My pipeline consisted of 5 steps. 
 
-1. First, image is converted to greyscale.
-
-![greyscaled image](process_greyscale.png)
+1. First, image is converted to greyscale ![greyscaled image](process_greyscale.png)
 
 2. Gaussian blur is applied to suppress noise in the image.
 
-3. Then, Canny edge detection is applied to find edges in the image. 
+3. Then, Canny edge detection is applied to find edges in the image. ![Canny edge detection](process_canny.png)
 
-![Canny edge detection](process_canny.png)
+4. Region of interest, described as a rectangular area is cropped not to deal with irrelevant structures in the other parts of the image. ![Crop roi](process_crop.png)
 
-4. Region of interest, described as a rectangular area is cropped not to deal with irrelevant structures in the other parts of the image. 
+5. Finally Hough transformation is applied and lines in the image are detected with start and end points. ![Hough](process_hough.png)
 
-![Crop roi](process_crop.png)
+### Drawing lines
+I filtered out detected lines by slope. Lines that have a slope in range of [-0.5, 0.5] are ignored. 
 
-5. Finally Hough transformation is applied and lines in the image is detected. 
+I modified the `draw_lines()` method in a way that line (showed in image above) is extrapolated to pass from bottom of the image and the top of the region of interest. Then top and bottom points of extrapolated lines are averaged to find only one top and one bottom point for left and right line. Then a single line is drawn between averaged points.
 
-![Hough](process_hough.png)
-
-#### Drawing lines
-
-After finding lines in image, lines are filtered by slope. I filtered out lines which has a slope not falling in range [-0.5, 0.5]. 
-
-I modified the `draw_lines()` method in a way that each detected and filtered line (showed in image above) is extrapolated to pass from bottom of the image and the top of the region of interest. Then top and bottom points of extrapolated lines are averaged to find one top and one bottom point for each left and right line. Then a single line is drawn between averaged points.
-
-Also a moving window average mechanism is implemented to smooth drawing. Averaged points of lines are pushed into history array and then averaged for last points as window size. 
-
-![Complete processed image](process_final.png)
+Also moving window average method is implemented to smooth line drawing. Drawn lines are pushed into history and then last n (window_size) frames are averaged. 
 
 ### Potential Shortcomings
 
